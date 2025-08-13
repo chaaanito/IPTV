@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@import "video.js/dist/video-js.min.css";
+
+#video-player {
+  width: 100vw;
+  height: 100vh;
+}
+
+@plugin "daisyui";
