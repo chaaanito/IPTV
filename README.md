@@ -1,47 +1,38 @@
-# Svelte + Vite
+# IPTV WebApp
 
-This template should help get you started developing with Svelte in Vite.
+An IPTV web application built with Vite + Svelte, powered by DexieJS, PeerJS, and Video.js.
 
-## Recommended IDE Setup
+## 📌 Overview
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+This project is a lightweight IPTV player with a built-in channel manager.
+It’s designed to run seamlessly on devices like Android TV while letting you manage channels from another device — no cloud required.
 
-## Need an official Svelte framework?
+## 🛠 Tech Stack
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+### Vite + Svelte
 
-## Technical considerations
+Fast, modern frontend development with Svelte’s reactivity and Vite’s blazing-fast bundling.
 
-**Why use this over SvelteKit?**
+### Video.js
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+Used as the core player for smooth playback of HLS and DASH streams, with cross-platform compatibility.
 
-This template contains as little as possible to get started with Vite + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+### DexieJS
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+IndexedDB wrapper for local storage of channels — ensures your channel list stays available offline.
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+### PeerJS
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+Enables peer-to-peer communication between devices.
+Example: Add or remove channels from your Android TV’s IPTV app directly from your phone.
 
-**Why include `.vscode/extensions.json`?**
+## 💡 How It Works
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+Local Backend Panel – Accessible via QR code from the main screen.
 
-**Why enable `checkJs` in the JS template?**
+Two-Way Sync – Devices connected with PeerJS instantly share changes (additions/deletions) to the channel list.
 
-It is likely that most cases of changing variable types in runtime are likely to be accidental, rather than deliberate. This provides advanced typechecking out of the box. Should you like to take advantage of the dynamically-typed nature of JavaScript, it is trivial to change the configuration.
+## 🤔 Why?
 
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/sveltejs/svelte-hmr/tree/master/packages/svelte-hmr#preservation-of-local-state).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```js
-// store.js
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
-```
+Because… why not?
+It’s fun, minimal, and gets the job done without bloated dependencies or heavy servers.
