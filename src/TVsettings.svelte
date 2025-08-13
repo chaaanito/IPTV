@@ -68,7 +68,7 @@
 </script>
 
 {#if connected}
-<div class="max-w-1/2 mx-auto mt-5">
+<div class="max-w-11/12 mx-auto mt-5">
     <form class="join w-full" onsubmit={addChannel}>
         <input class="input join-item w-1/3" placeholder="name" bind:value={name} required/>
         <input class="input join-item w-2/3" placeholder="url" bind:value={url} required/>
