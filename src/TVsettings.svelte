@@ -10,7 +10,11 @@
   let channels = $state([])
 
  onMount(() => {
-    const peer = new Peer();
+    const peer = new Peer("",{
+      config: {
+        iceServers: []
+      }
+    });
 
     peer.on('open', async function(id) {
         console.log('client peer ID:', id);

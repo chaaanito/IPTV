@@ -19,7 +19,12 @@
     await updatePlayer()
 
 
-    const peer = new Peer(localStorage.getItem("server_id") || "");
+    //this will force WebRTC to use LAN mode, but still it needs to check in the signalling server from peerJS
+    const peer = new Peer(localStorage.getItem("server_id") || "",{
+      config: {
+        iceServers: []
+      }
+    });
 
     peer.on('open', async function(id) {
         localStorage.setItem('server_id', id)
