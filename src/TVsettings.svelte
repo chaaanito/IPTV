@@ -47,27 +47,41 @@
                 }
             }
         });
+
+        conn.on('close', () => {
+            console.log("❌ Disconnected!");
+        });
     });
  })
 
  const removeChannel = async (id) => {
-    conn.send({
-        type: "delete",
-        id: id
-    })
+    if (conn.open) {
+        conn.send({
+            type: "delete",
+            id: id
+        })
+    } else {
+       toast.error('Not connected.')
+    }
  }
 
  let name = $state("")
  let url = $state("")
  const addChannel = async (e) => {
     e.preventDefault()
-    conn.send({
+
+    if (conn.open) {
+        conn.send({
         type: "add",
         data: {
             name: name,
             url: url
         }
     })
+    } else {
+        console.log("Not connected.");
+    }
+    
  }
 </script>
 
