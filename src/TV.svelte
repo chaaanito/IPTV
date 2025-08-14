@@ -79,7 +79,7 @@
 
       player = videojs('video-player', {
                  techOrder: ['html5', 'youtube'],
-                  autoplay: true,
+                  // autoplay: true,
                   preload: 'auto',
                   controlBar: false,
                   youtube: {
