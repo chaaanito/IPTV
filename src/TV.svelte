@@ -3,6 +3,7 @@
   import QRCode from 'qrcode';
   import { onMount } from "svelte";
   import videojs from "video.js";
+  import 'videojs-youtube';
   import { addChannel, deleteChannel, getChannels, tv } from "./lib/db.svelte.js";
 
   let videoEl = null
@@ -69,17 +70,25 @@
 
           container.appendChild(videoEl)
 
-      player = videojs('video-player', {
-                      fullscreen: true,
-                      autoplay: true,
-                      preload: true,
-                      controlBar: false,
-                })
+      let url = tv.channels[index]?.url || '';
+      let type = 'application/vnd.apple.mpegurl'; // default HLS
 
-      player.src({
-        src: tv.channels[index]?.url,
-        type: 'application/vnd.apple.mpegurl'
-      })
+      if (/youtube\.com|youtu\.be/.test(url)) {
+        type = 'video/youtube';
+      }
+
+      player = videojs('video-player', {
+                 techOrder: ['html5', 'youtube'],
+                  autoplay: true,
+                  preload: 'auto',
+                  controlBar: false,
+                  youtube: {
+                    modestbranding: 1,
+                    rel: 0
+                  }
+            })
+
+      player.src({ src: url, type: type });
   }
 
   const prev = async () => {
@@ -111,6 +120,14 @@
     await updatePlayer()
     player.play()
   }
+
+  function toggleFullscreen() {
+    if (player.isFullscreen()) {
+      player.exitFullscreen();
+    } else {
+      player.requestFullscreen();
+    }
+  }
 </script>
 
 <div class="navbar fixed top-1 z-10">
@@ -140,6 +157,12 @@
     <div class=" text-2xl font-black"><img src="{QRImage}" alt="qr"></div>
   </div>
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scan-qr-code-icon lucide-scan-qr-code"><path d="M17 12v4a1 1 0 0 1-1 1h-4"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M17 8V7"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M7 17h.01"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="5" height="5" rx="1"/></svg>
+</div>
+<div class="fixed bottom-20 right-5 z-[2147483647]">
+  <!-- svelte-ignore a11y_consider_explicit_label -->
+  <button class="btn btn-ghost" onclick={toggleFullscreen}>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-expand-icon lucide-expand"><path d="m15 15 6 6"/><path d="m15 9 6-6"/><path d="M21 16v5h-5"/><path d="M21 8V3h-5"/><path d="M3 16v5h5"/><path d="m3 21 6-6"/><path d="M3 8V3h5"/><path d="M9 9 3 3"/></svg>
+  </button>
 </div>
 {/if}
 </div>
