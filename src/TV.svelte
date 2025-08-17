@@ -70,24 +70,19 @@
         type = 'video/youtube';
       }
 
-    player = new Plyr(video, {
-      controls: ['play-large'],
-      captions: {
-        active: true,
-        update: true,
-        language: 'en'
-      }
-      });
+      player = videojs('video-player', {
+                 techOrder: ['html5', 'youtube'],
+                  autoplay: true,
+                  preload: 'auto',
+                  controlBar: false,
+                  youtube: {
+                    modestbranding: 1,
+                    rel: 0
+                  }
+            })
 
-    if (!Hls.isSupported()) {
-      video.src = url;
-    } else {
-      const hls = new Hls()
-      hls.loadSource(url);
-      hls.attachMedia(video);
-      window.hls = hls;
-    }
-    }
+      player.src({ src: url, type: type });
+  }
 
   const prev = async () => {
     if (index > 0) {
