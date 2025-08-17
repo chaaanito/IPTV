@@ -2,9 +2,9 @@
   import { Peer } from "peerjs";
   import QRCode from 'qrcode';
   import { onMount } from "svelte";
-  import videojs from "video.js";
-  import 'videojs-youtube';
   import { addChannel, deleteChannel, getChannels, tv } from "./lib/db.svelte.js";
+  import Hls from "hls.js/dist/hls.light.js";
+  import Plyr from 'plyr';
 
   let videoEl = null
   let QRImage = $state()
@@ -61,14 +61,7 @@
     })
 
   const updatePlayer = async () => {
-      let container = document.getElementById('video-container')
-
-      let videoEl = document.createElement('video')
-          videoEl.setAttribute('id','video-player')
-          videoEl.classList.add('video-js','vjs-default-skin','vjs-big-play-centered')
-          videoEl.setAttribute('controls','')
-
-          container.appendChild(videoEl)
+      const video = document.querySelector('video')
 
       let url = tv.channels[index]?.url || '';
       let type = 'application/vnd.apple.mpegurl'; // default HLS
@@ -77,19 +70,24 @@
         type = 'video/youtube';
       }
 
-      player = videojs('video-player', {
-                 techOrder: ['html5', 'youtube'],
-                  autoplay: true,
-                  preload: 'auto',
-                  controlBar: false,
-                  youtube: {
-                    modestbranding: 1,
-                    rel: 0
-                  }
-            })
+    player = new Plyr(video, {
+      controls: ['play-large'],
+      captions: {
+        active: true,
+        update: true,
+        language: 'en'
+      }
+      });
 
-      player.src({ src: url, type: type });
-  }
+    if (!Hls.isSupported()) {
+      video.src = url;
+    } else {
+      const hls = new Hls()
+      hls.loadSource(url);
+      hls.attachMedia(video);
+      window.hls = hls;
+    }
+    }
 
   const prev = async () => {
     if (index > 0) {
@@ -99,7 +97,7 @@
     }
 
     if (player) {
-      player.dispose()
+      player.destroy()
     }
 
     await updatePlayer()
@@ -114,7 +112,7 @@
     }
 
     if (player) {
-      player.dispose()
+      player.destroy()
     }
 
     await updatePlayer()
@@ -122,11 +120,7 @@
   }
 
   function toggleFullscreen() {
-    if (player.isFullscreen()) {
-      player.exitFullscreen();
-    } else {
-      player.requestFullscreen();
-    }
+    player.fullscreen.toggle()
   }
 </script>
 
@@ -140,14 +134,17 @@
   </div>
 </div>
 
-<div id='video-container' class="w-[100vw] h-[100vh]"></div>
+<div class="video-container">
+	<!-- svelte-ignore a11y_media_has_caption -->
+	<video controls crossorigin playsinline></video>
+</div>
 
 <div class="fixed bottom-0 left-0 z-50 w-full h-[200px] opacity-0 transition-opacity duration-[2000ms] hover:opacity-100 hover:duration-[150ms]">
     <!-- svelte-ignore a11y_consider_explicit_label -->
   <div class="controllers flex flex-row w-400px justify-center gap-10">
     <button onclick={() => prev()} class="hover:text-primary transition-opacity duration-[500ms]"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-big-left-dash-icon lucide-arrow-big-left-dash"><path d="M13 9a1 1 0 0 1-1-1V5.061a1 1 0 0 0-1.811-.75l-6.835 6.836a1.207 1.207 0 0 0 0 1.707l6.835 6.835a1 1 0 0 0 1.811-.75V16a1 1 0 0 1 1-1h2a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1z"/><path d="M20 9v6"/></svg></button>
     <button onclick={() => player.play()} class="hover:text-primary transition-opacity duration-[500ms]"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play-icon lucide-play"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></button>
-    <button onclick={() => {player.currentTime(0); player.pause();}} class="hover:text-primary transition-opacity duration-[500ms]"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-stop-icon lucide-circle-stop"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></button>
+    <button onclick={() => player.stop()} class="hover:text-primary transition-opacity duration-[500ms]"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-stop-icon lucide-circle-stop"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></button>
     <button onclick={() => next()} class="hover:text-primary transition-opacity duration-[500ms]"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-big-right-dash-icon lucide-arrow-big-right-dash"><path d="M11 9a1 1 0 0 0 1-1V5.061a1 1 0 0 1 1.811-.75l6.836 6.836a1.207 1.207 0 0 1 0 1.707l-6.836 6.835a1 1 0 0 1-1.811-.75V16a1 1 0 0 0-1-1H9a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1z"/><path d="M4 9v6"/></svg></button>
   </div>
   

@@ -148,5 +148,5 @@
         100% {
             background-position: right
         }
-        }
+    }
 </style>
